@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestion des charges</title>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
+<meta name="theme-color" content="#1f6f4a">
+<style>
+:root{--bg:#f5f7f6;--card:#fff;--tx:#18221d;--mu:#6b7a72;--bd:#e3e9e6;--pr:#1f6f4a;--pr2:#17593a;--soft:#e9f3ee;--r:#d93025;--rsoft:#fdecea;--a:#b7791f;--asoft:#fdf4e3;--v:#15803d;--vsoft:#e8f6ed;--side:#101a15;--sideTx:#9fb3a9;--sh:0 1px 2px rgba(16,24,40,.05),0 1px 3px rgba(16,24,40,.06);--sh2:0 10px 30px rgba(16,24,40,.12);--rl:14px;--rm:10px}
+@media(prefers-color-scheme:dark){:root{--bg:#0e1411;--card:#171f1b;--tx:#e6eee9;--mu:#8fa198;--bd:#26302a;--pr:#35a56f;--pr2:#2b8a5c;--soft:#153024;--vsoft:#132a1c;--asoft:#2a2312;--rsoft:#2d1614;--sh:0 1px 2px rgba(0,0,0,.4);--sh2:0 10px 30px rgba(0,0,0,.5)}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.5 Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--pr);outline-offset:2px;border-radius:6px}
+.shell{display:flex;min-height:100vh}
+.side{position:fixed;inset:0 auto 0 0;width:244px;background:var(--side);color:var(--sideTx);display:flex;flex-direction:column;z-index:60;transition:transform .2s ease}
+.brand{display:flex;align-items:center;gap:10px;padding:18px;color:#fff;font-weight:700;font-size:14.5px;letter-spacing:-.01em}
+.brand .logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#35a56f,#1f6f4a);display:grid;place-items:center;font-size:17px;flex:none}
+.brand small{display:block;font-weight:500;font-size:11px;color:var(--sideTx);opacity:.75}
+.nav{flex:1;padding:6px 0;overflow-y:auto}
+.nav button{display:flex;align-items:center;gap:11px;width:calc(100% - 20px);margin:2px 10px;padding:10px 12px;border:0;border-radius:9px;background:none;color:var(--sideTx);cursor:pointer;font-size:14px;font-weight:500;text-align:left;transition:background .15s,color .15s}
+.nav button svg{opacity:.7;flex:none}
+.nav button:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav button.on{background:rgba(53,165,111,.16);color:#fff}
+.nav button.on svg{opacity:1;color:#4cc98a}
+.side-foot{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08);font-size:12px;line-height:1.6}
+.side-foot b{color:#dfe9e4}.side-foot a{color:#7dd3a8;text-decoration:none}
+.content{flex:1;margin-left:244px;min-width:0;display:flex;flex-direction:column}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:12px 24px;background:var(--card);border-bottom:1px solid var(--bd)}
+.topbar .ttl{font-weight:700;font-size:16px;letter-spacing:-.01em}
+.topbar .sp{flex:1}
+.brg{display:none;background:none;border:1px solid var(--bd);border-radius:8px;padding:7px;cursor:pointer;line-height:0;color:var(--tx)}
+.u{background:var(--soft);color:var(--pr);border:1px solid transparent;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:600;font-size:13px;transition:.15s}
+.u:hover{filter:brightness(.96)}
+main{width:100%;max-width:1080px;margin:0 auto;padding:24px;flex:1;min-height:70vh}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--rl);padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
+h3{margin:0 0 12px;font-size:14.5px;font-weight:700;letter-spacing:-.01em}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:var(--rl);padding:16px;box-shadow:var(--sh)}
+.kpi .ki{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;background:var(--soft);color:var(--pr);margin-bottom:10px}
+.kpi .ki.a{background:var(--asoft);color:var(--a)}.kpi .ki.r{background:var(--rsoft);color:var(--r)}.kpi .ki.v{background:var(--vsoft);color:var(--v)}.kpi .ki.n{background:#eef2f0;color:var(--mu)}
+@media(prefers-color-scheme:dark){.kpi .ki.n{background:#222c26}}
+.kpi b{display:block;font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.kpi span{color:var(--mu);font-size:12.5px}.kpi small{display:block;font-size:12px;margin-top:3px}
+input,select,button.b{padding:9px 12px;border:1px solid var(--bd);border-radius:var(--rm);background:var(--card);color:var(--tx);transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus{outline:none;border-color:var(--pr);box-shadow:0 0 0 3px var(--soft)}
+button.b{background:var(--pr);color:#fff;border:0;cursor:pointer;font-weight:600;font-size:14px}
+button.b:hover{background:var(--pr2)}
+button.b.s{background:var(--card);color:var(--pr);border:1px solid var(--pr)}
+button.b.s:hover{background:var(--soft)}
+button.b.d{background:var(--card);color:var(--r);border:1px solid var(--r)}
+button.b.d:hover{background:var(--rsoft)}
+button.b.sm{padding:5px 10px;font-size:12.5px;border-radius:8px}
+button.b.big{width:100%;font-size:16px;padding:13px;border-radius:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.row>input,.row>select{flex:1;min-width:140px}
+table{width:100%;border-collapse:collapse}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--mu);font-weight:600;text-align:left;padding:10px;border-bottom:1px solid var(--bd)}
+td{padding:12px 10px;border-bottom:1px solid var(--bd);font-size:14px;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tr:hover td{background:rgba(127,147,136,.05)}
+.tw{overflow-x:auto}
+.pill{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.p0{background:#eef2f0;color:var(--mu)}.pr{background:var(--rsoft);color:var(--r)}.pa{background:var(--asoft);color:var(--a)}.pv{background:var(--vsoft);color:var(--v)}
+.x{text-decoration:line-through;opacity:.55}.ina{opacity:.55}.mu{color:var(--mu)}.up{color:var(--v)}.dn{color:var(--r)}
+.ch{display:flex;gap:6px;align-items:flex-end;height:200px;min-width:max-content}
+.bc{flex:1;min-width:42px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.bars{display:flex;gap:3px;align-items:flex-end;height:130px;width:100%}
+.bars i{flex:1;min-height:3px;border-radius:4px 4px 0 0;transition:height .3s}
+.bc small{font-size:11px}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 12px}
+.meter{height:8px;background:var(--bd);border-radius:99px;overflow:hidden;min-width:80px}
+.meter div{height:100%;background:linear-gradient(90deg,var(--pr),#35a56f);border-radius:99px}
+.toast{position:fixed;bottom:24px;right:24px;background:#14201a;color:#fff;padding:12px 18px;border-radius:12px;z-index:99;box-shadow:var(--sh2);font-weight:600;font-size:14px;animation:tin .2s ease}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+footer{text-align:center;padding:18px;color:var(--mu);font-size:13px;border-top:1px solid var(--bd)}footer a{color:var(--pr);text-decoration:none;font-weight:600}
+.po{display:none}.ov{display:none}
+@media(max-width:900px){.brg{display:block}.side{transform:translateX(-100%);box-shadow:var(--sh2)}body.open .side{transform:none}body.open .ov{display:block;position:fixed;inset:0;background:rgba(10,16,13,.45);z-index:50}.content{margin-left:0}.topbar{padding:10px 14px}main{padding:14px}}
+@media(max-width:640px){table,tbody{display:block}tr:first-child{display:none}tr{display:block;border:1px solid var(--bd);border-radius:12px;padding:10px 12px;margin-bottom:10px;background:var(--card);box-shadow:var(--sh)}td{display:flex;justify-content:space-between;align-items:center;gap:10px;border:0;padding:5px 0}td::before{content:attr(data-l);color:var(--mu);font-size:12.5px;flex:none}td[colspan]::before{content:''}}
+@media print{.side,.topbar,.np,.ov{display:none!important}.content{margin:0}body{background:#fff;color:#000}.card,.kpi{border-color:#999;box-shadow:none;break-inside:avoid}.po{display:block}main{max-width:none;padding:0}.tw{overflow:visible}.pr-sign{margin-top:40px;display:flex;justify-content:space-around}}
+</style></head><body>
+<div class="shell">
+<aside class="side">
+<div class="brand"><span class="logo">🚚</span><span>Gestion des charges<small>Coopérative · Camions</small></span></div>
+<nav class="nav" id="nav"></nav>
+<div class="side-foot">Développé par <b>Anaclet Mwela</b><br><a href="tel:+243999786858">+243 999 786 858</a></div>
+</aside>
+<div class="ov" onclick="document.body.classList.remove('open')"></div>
+<div class="content">
+<header class="topbar" id="hd"></header>
+<main id="app"></main>
+<footer>Fonctionne hors-ligne · Données stockées localement sur cet appareil</footer>
+</div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const p2=n=>String(n).padStart(2,'0');
+const dk=t=>{const d=new Date(t);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())};
+const ICO={dash:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',truck:'<path d="M14 18V6a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h1"/><path d="M14 9h4l4 4v5a1 1 0 0 1-1 1h-2"/><path d="M9 18h4"/><circle cx="6" cy="18" r="2"/><circle cx="17" cy="18" r="2"/>',box:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/>',hist:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',chart:'<line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/>',set:'<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',menu:'<line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/>',zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',user:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'};
+const ico=(n,s=18)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICO[n]||''}</svg>`;
+const kpi=(i,l,v,t,x)=>`<div class="kpi"><div class="ki ${t||''}">${ico(i)}</div><b>${v}</b><span>${l}</span>${x||''}</div>`;
+let db,S={clients:[],camions:[],charges:[],chargements:[],q:3,clot:[]},tab='dash',F={q:'',from:'',to:'',type:''},CQ='',KQ='',FC=0,CJ='';
+const R={from:dk(Date.now()-6*864e5),to:dk(Date.now()),g:'jour',inact:7};
+const TABS=[['dash','Tableau de bord','dash'],['cli','Clients','users'],['cam','Camions','truck'],['load','Chargement','box'],['hist','Historique','hist'],['rap','Rapports','chart'],['set','Réglages','set']];
+const STO=['clients','camions','charges','chargements'];
+const open=()=>new Promise((ok,ko)=>{const r=indexedDB.open('charges-db',1);r.onupgradeneeded=()=>{STO.forEach(n=>r.result.createObjectStore(n,{keyPath:'id',autoIncrement:true}));r.result.createObjectStore('reglages',{keyPath:'k'})};r.onsuccess=()=>ok(r.result);r.onerror=()=>ko(r.error)});
+const tx=(s,m,f)=>new Promise((ok,ko)=>{const t=db.transaction(s,m);const rq=f(t.objectStore(s));t.oncomplete=()=>ok(rq&&rq.result);t.onerror=()=>ko(t.error)});
+const all=s=>tx(s,'readonly',o=>o.getAll()),put=(s,v)=>tx(s,'readwrite',o=>o.put(v)),clr=s=>tx(s,'readwrite',o=>o.clear());
+async function load(){for(const s of STO)S[s]=await all(s);const r=await all('reglages');S.q=(r.find(x=>x.k==='quota')||{v:3}).v;S.clot=(r.find(x=>x.k==='clot')||{v:[]}).v}
+const day=t=>new Date(t).toDateString();
+async function autoReset(){for(const c of S.camions)if(c.etat==='charge'&&day(c.chargeLe)!==day(Date.now())){c.etat='dispo';await put('camions',c)}}
+const nm=id=>(S.clients.find(c=>c.id===id)||{}).nom||'?',pl=id=>(S.camions.find(c=>c.id===id)||{}).plaque||'?';
+const solde=id=>S.charges.filter(x=>x.clientId===id&&!x.annule).reduce((a,x)=>a+x.n,0)-S.chargements.filter(x=>x.clientId===id&&!x.annule).reduce((a,x)=>a+x.quota,0);
+function badge(s){const q=S.q;const c=s>=q?'pv':s>=q*2/3&&s>0?'pa':s>0?'pr':'p0';const l=s>=q?'Droit au camion':c==='pa'?'Ambre':c==='pr'?'Rouge':'Aucune';return `<span class="pill ${c}">${s} / ${q} · ${l}</span>`}
+const fd=t=>new Date(t).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'});
+const lab=c=>c.nom+(c.tel?' · '+c.tel:'');
+const findCli=v=>{v=v.trim().toLowerCase();const a=S.clients.filter(c=>!c.inactif);return a.find(c=>lab(c).toLowerCase()===v)||a.find(c=>c.nom.toLowerCase()===v)};
+const chf=k=>k.chauffeurId?nm(k.chauffeurId):(k.chauffeur||'');
+const chl=k=>{const c=S.clients.find(c=>c.id===k.chauffeurId);return c?lab(c):(k.chauffeur||'')};
+const camLab=k=>k.plaque+(chf(k)?' · '+chf(k):'');
+const dlist=(id,a)=>`<datalist id="${id}">${a.map(x=>`<option value="${esc(x)}">`).join('')}</datalist>`;
+const AC=()=>S.clients.filter(c=>!c.inactif),AK=()=>S.camions.filter(k=>!k.inactif);
+const DL=()=>dlist('dl-cli',AC().map(lab))+dlist('dl-names',[...new Set([...S.clients.map(c=>c.nom),...S.camions.map(k=>k.plaque)])])+dlist('dl-lc',AC().filter(c=>solde(c.id)>=S.q).map(lab))+dlist('dl-lk',AK().filter(k=>k.etat!=='charge').map(camLab));
+const ev=()=>[...S.charges.map(x=>({t:'charge',...x})),...S.chargements.map(x=>({t:'chargement',...x}))].sort((a,b)=>b.date-a.date);
+const rng=()=>[F.from?new Date(F.from+'T00:00:00').getTime():0,F.to?new Date(F.to+'T23:59:59').getTime():1e15];
+function filt(){const [f,t]=rng(),q=F.q.toLowerCase();return ev().filter(e=>e.date>=f&&e.date<=t&&(!F.type||e.t===F.type)&&(!q||(nm(e.clientId)+' '+(e.camionId?pl(e.camionId):'')).toLowerCase().includes(q)))}
+const norm=p=>p.toUpperCase().replace(/[\s-]/g,'');
+const blk=t=>{if(S.clot.some(c=>c.jour===dk(t))){alert('La journée du '+dk(t)+' est clôturée. Rouvrez-la depuis le tableau de bord pour modifier.');return true}return false};
+const mob=()=>document.querySelectorAll('table').forEach(t=>{const h=[...t.rows[0].cells].map(c=>c.textContent);[...t.rows].slice(1).forEach(r=>[...r.cells].forEach((c,i)=>c.dataset.l=h[i]||''))});
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2500)}
+async function refresh(){await load();render()}
+
+/* ---- actions ---- */
+async function addClient(){const n=$('#cn').value.trim(),t=$('#ct').value.trim();if(!n)return alert('Nom requis');
+ const dup=S.clients.find(c=>!c.inactif&&(c.nom.toLowerCase()===n.toLowerCase()||(t&&c.tel===t)));
+ if(dup&&!confirm(`Un client similaire existe déjà : ${dup.nom} ${dup.tel||''}.\nCréer quand même ?`))return;
+ await put('clients',{nom:n,tel:t,date:Date.now()});refresh()}
+async function editClient(id){const c=S.clients.find(x=>x.id===id),n=prompt('Nom du client :',c.nom);if(n===null)return;if(!n.trim())return alert('Nom requis');const t=prompt('Téléphone :',c.tel||'');if(t===null)return;c.nom=n.trim();c.tel=t.trim();await put('clients',c);refresh()}
+async function addCamion(){const p=$('#kp').value.trim(),c=findCli($('#kc').value);if(!p)return alert('Immatriculation requise');
+ if(!c)return alert('Le chauffeur doit être un client enregistré : choisissez-le dans la liste.');
+ if(S.camions.some(k=>norm(k.plaque)===norm(p)))return alert('Cette immatriculation existe déjà.');
+ await put('camions',{plaque:p.toUpperCase(),chauffeurId:c.id,etat:'dispo',date:Date.now()});refresh()}
+async function editCamion(id){const k=S.camions.find(x=>x.id===id),p=prompt('Immatriculation :',k.plaque);if(p===null||!p.trim())return;if(S.camions.some(x=>x.id!==id&&norm(x.plaque)===norm(p)))return alert('Cette immatriculation existe déjà.');k.plaque=p.trim().toUpperCase();await put('camions',k);refresh()}
+async function setChauffeur(id,v){const k=S.camions.find(c=>c.id===id),c=findCli(v);if(!c){alert('Le chauffeur doit être un client enregistré.');return refresh()}k.chauffeurId=c.id;delete k.chauffeur;await put('camions',k);refresh()}
+async function toggle(s,id){const o=S[s].find(x=>x.id===id);if(!o.inactif&&!confirm('Désactiver « '+(o.nom||o.plaque)+' » ? Il ne sera plus proposé, mais son historique est conservé.'))return;o.inactif=!o.inactif;await put(s,o);refresh()}
+async function merge(){const src=S.clients.find(c=>c.id===FC),t=findCli($('#fm').value);if(!t||t.id===FC)return alert('Choisissez un autre client dans la liste');
+ if(!confirm(`Fusionner « ${src.nom} » dans « ${t.nom} » ?\nCharges, chargements et camions seront transférés. « ${src.nom} » sera désactivé.`))return;
+ for(const x of S.charges.filter(x=>x.clientId===FC)){x.clientId=t.id;await put('charges',x)}
+ for(const x of S.chargements.filter(x=>x.clientId===FC)){x.clientId=t.id;await put('chargements',x)}
+ for(const k of S.camions.filter(k=>k.chauffeurId===FC)){k.chauffeurId=t.id;await put('camions',k)}
+ src.inactif=true;src.fusionneVers=t.id;await put('clients',src);FC=t.id;refresh()}
+async function addCharge(id,n,date){n=parseInt(n);if(!n||n<1)return;date=date||Date.now();if(blk(date))return;await put('charges',{clientId:id,n,date,cree:Date.now()});await refresh();toast('+'+n+' charge(s) · '+nm(id))}
+function askCharge(id){addCharge(id,prompt('Nombre de charges à octroyer à '+nm(id)+' :','1'))}
+function quick(){const c=findCli($('#qc').value);if(!c)return alert('Choisissez un client dans la liste');const v=$('#qd').value,d=v?new Date(v).getTime():Date.now();if(d>Date.now()+6e4)return alert('La date ne peut pas être dans le futur');addCharge(c.id,$('#qn').value,d)}
+function autoCam(){const c=findCli($('#lc').value);if(!c)return;const k=AK().find(k=>k.chauffeurId===c.id&&k.etat!=='charge');if(k&&!$('#lk').value)$('#lk').value=camLab(k)}
+async function doLoad(){const cc=findCli($('#lc').value),k=AK().find(c=>camLab(c).toLowerCase()===$('#lk').value.trim().toLowerCase());if(!cc||!k)return alert('Choisissez un client et un camion dans les listes');const ci=cc.id;
+ if(k.etat==='charge')return alert('Ce camion est déjà chargé');if(solde(ci)<S.q)return alert('Quota non atteint');if(blk(Date.now()))return;
+ const id=await tx('chargements','readwrite',o=>o.add({clientId:ci,camionId:k.id,quota:S.q,date:Date.now(),cree:Date.now()}));
+ k.etat='charge';k.chargeLe=Date.now();k.dernier=id;await put('camions',k);await refresh();toast('Chargement enregistré')}
+async function cancel(t,id,auto){const s=t==='charge'?'charges':'chargements',o=S[s].find(x=>x.id===id);if(blk(o.date)||blk(Date.now()))return;
+ if(t==='charge'&&solde(o.clientId)-o.n<0)return alert('Annulation impossible : le solde du client deviendrait négatif. Annulez d\'abord son chargement.');
+ const m=auto||(prompt('Motif de l\'annulation (obligatoire) :')||'').trim();if(!m)return alert('Un motif est obligatoire pour annuler.');
+ o.annule=true;o.annuleLe=Date.now();o.annuleMotif=m;await put(s,o);
+ if(t==='chargement'){const k=S.camions.find(c=>c.id===o.camionId);if(k&&k.etat==='charge'&&k.dernier===id){k.etat='dispo';await put('camions',k)}}refresh()}
+function lastOp(){const x=ev().filter(e=>!e.annule).sort((a,b)=>(b.cree||b.date)-(a.cree||a.date))[0];return x&&(x.cree||x.date)>Date.now()-6e5&&!S.clot.some(c=>c.jour===dk(x.date))?x:null}
+function undoLast(){const x=lastOp();if(x&&confirm('Annuler '+(x.t==='charge'?'+'+x.n+' charge(s)':'le chargement')+' de '+nm(x.clientId)+' ?'))cancel(x.t,x.id,'Erreur de saisie (annulation immédiate)')}
+async function freeCamion(id){const k=S.camions.find(c=>c.id===id);k.etat='dispo';await put('camions',k);refresh()}
+function bilan(j){const s=t=>dk(t)===j;return{charges:S.charges.filter(x=>!x.annule&&s(x.date)).reduce((a,x)=>a+x.n,0),chargements:S.chargements.filter(x=>!x.annule&&s(x.date)).length,annulations:[...S.charges,...S.chargements].filter(x=>x.annule&&s(x.annuleLe)).length}}
+async function cloturer(j){if(!confirm('Clôturer la journée du '+j+' ?\nPlus aucune opération ne pourra y être ajoutée ou annulée.'))return;S.clot.push({jour:j,le:Date.now(),...bilan(j)});await put('reglages',{k:'clot',v:S.clot});refresh()}
+async function rouvrir(j){if(!confirm('Rouvrir la journée du '+j+' ?'))return;S.clot=S.clot.filter(c=>c.jour!==j);await put('reglages',{k:'clot',v:S.clot});refresh()}
+function anomalies(){const A=[],since=Date.now()-14*864e5,q=S.q,m={},c={},a={};
+ S.chargements.filter(x=>!x.annule&&x.date>=since).forEach(x=>{(m[x.camionId+'|'+dk(x.date)]??=[]).push(x)});
+ Object.values(m).filter(v=>v.length>1).forEach(v=>A.push(`🚚 Camion ${pl(v[0].camionId)} chargé ${v.length} fois le ${dk(v[0].date)} (${[...new Set(v.map(x=>nm(x.clientId)))].join(', ')})`));
+ S.charges.filter(x=>!x.annule&&x.date>=since).forEach(x=>{const k=x.clientId+'|'+dk(x.date);c[k]=(c[k]||0)+x.n});
+ Object.entries(c).filter(([,n])=>n>=2*q).forEach(([k,n])=>{const [i,j]=k.split('|');A.push(`👤 ${nm(+i)} a reçu ${n} charges en une journée (${j})`)});
+ [...S.charges,...S.chargements].filter(x=>x.annule&&x.annuleLe>=since).forEach(x=>{const j=dk(x.annuleLe);a[j]=(a[j]||0)+1});
+ Object.entries(a).filter(([,n])=>n>=3).forEach(([j,n])=>A.push(`↩️ ${n} annulations le ${j}`));return A}
+async function saveQ(){const v=parseInt($('#sq').value);if(!v||v<1)return;await put('reglages',{k:'quota',v});refresh()}
+async function exportJSON(){const d={};for(const s of [...STO,'reglages'])d[s]=await all(s);dl('sauvegarde-charges-'+dk(Date.now())+'.json',JSON.stringify(d),'application/json');localStorage.lastBackup=Date.now();render()}
+async function importJSON(f){if(!f||!confirm('Remplacer TOUTES les données actuelles par cette sauvegarde ?'))return;const d=JSON.parse(await f.text());
+ for(const s of [...STO,'reglages']){await clr(s);for(const v of d[s]||[])await put(s,v)}refresh()}
+function dl(n,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+c],{type:t+';charset=utf-8'}));a.download=n;a.click()}
+function csv(){const l=[['Date','Type','Client','Camion','Charges','Statut','Motif annulation']];filt().forEach(e=>l.push([fd(e.date),e.t,nm(e.clientId),e.camionId?pl(e.camionId):'',e.t==='charge'?e.n:e.quota,e.annule?'annulé':'ok',e.annuleMotif||'']));
+ dl('historique.csv',l.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n'),'text/csv')}
+function xls(name,sheets){const x=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+ const w=Object.entries(sheets).map(([n,rows])=>`<Worksheet ss:Name="${n}"><Table>${rows.map((r,i)=>`<Row>${r.map(v=>`<Cell${i==0?' ss:StyleID="h"':''}><Data ss:Type="${typeof v==='number'?'Number':'String'}">${x(v)}</Data></Cell>`).join('')}</Row>`).join('')}</Table></Worksheet>`).join('');
+ dl(name,`<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Styles><Style ss:ID="h"><Font ss:Bold="1"/><Interior ss:Color="#D9EAD3" ss:Pattern="Solid"/></Style></Styles>${w}</Workbook>`,'application/vnd.ms-excel')}
+
+/* ---- rapports ---- */
+function calc(){const f=new Date(R.from+'T00:00:00').getTime(),t=new Date(R.to+'T23:59:59').getTime();if(!(f<=t))return null;
+ const len=Math.round((t-f)/864e5),inr=(a,b)=>ev().filter(e=>!e.annule&&e.date>=a&&e.date<=b),E=inr(f,t),P=inr(f-len*864e5,f-1);
+ const st=E=>({c:E.filter(e=>e.t==='charge').reduce((s,e)=>s+e.n,0),l:E.filter(e=>e.t==='chargement').length,k:new Set(E.filter(e=>e.t==='chargement').map(e=>e.camionId)).size,u:new Set(E.map(e=>e.clientId)).size});
+ const bkt=x=>{if(R.g==='mois')return x.slice(0,7);if(R.g==='semaine'){const d=new Date(x+'T12:00:00');d.setDate(d.getDate()-((d.getDay()+6)%7));return dk(d)}return x},B={};
+ if(R.g==='jour')for(let d=f;d<=t;d+=864e5)B[dk(d)]={c:0,l:0};
+ E.forEach(e=>{const k=bkt(dk(e.date));B[k]??={c:0,l:0};e.t==='charge'?B[k].c+=e.n:B[k].l++});
+ const bc={},bk={};E.forEach(e=>{const o=bc[e.clientId]??={c:0,l:0};e.t==='charge'?o.c+=e.n:o.l++;if(e.t==='chargement'){const q=bk[e.camionId]??={l:0,d:new Set(),cl:new Set()};q.l++;q.d.add(dk(e.date));q.cl.add(nm(e.clientId))}});
+ const use=AK().map(k=>{const q=bk[k.id];return{k,l:q?q.l:0,d:q?q.d.size:0,pct:Math.min(100,Math.round((q?q.d.size:0)/Math.max(1,len)*100))}}).sort((a,b)=>b.pct-a.pct);
+ const inact=AC().map(c=>({c,s:solde(c.id),last:(ev().find(e=>!e.annule&&e.clientId===c.id)||{}).date})).filter(x=>x.s>0&&x.last&&(Date.now()-x.last)/864e5>=R.inact).sort((a,b)=>a.last-b.last);
+ return{f,t,len,E,a:st(E),b:st(P),bs:Object.entries(B).sort(([x],[y])=>x<y?-1:1),bc,bk,use,inact,rank:Object.entries(bc).filter(([,v])=>v.c>0).sort(([,x],[,y])=>y.c-x.c).slice(0,8)}}
+function exportXls(){const d=calc();if(!d)return alert('Période invalide');
+ xls('rapport-'+R.from+'_'+R.to+'.xml',{'Résumé':[['Indicateur','Période '+R.from+' au '+R.to,'Période précédente'],['Charges octroyées',d.a.c,d.b.c],['Chargements',d.a.l,d.b.l],['Camions utilisés',d.a.k,d.b.k],['Clients actifs',d.a.u,d.b.u]],
+ 'Historique':[['Date','Type','Client','Camion','Charges'],...d.E.map(e=>[fd(e.date),e.t,nm(e.clientId),e.camionId?pl(e.camionId):'',e.t==='charge'?e.n:e.quota])],
+ 'Par client':[['Client','Charges','Chargements','Solde actuel'],...Object.entries(d.bc).map(([i,v])=>[nm(+i),v.c,v.l,solde(+i)])],
+ 'Par camion':[['Camion','Chargements','Jours utilisés','Utilisation %'],...d.use.map(u=>[u.k.plaque,u.l,u.d,u.pct])]})}
+const delta=(x,y)=>`<small class="${x>y?'up':x<y?'dn':'mu'}">${x>y?'▲ +'+(x-y):x<y?'▼ '+(x-y):'= stable'} (préc. ${y})</small>`;
+const rdates=()=>`<input type="date" value="${R.from}" onchange="R.from=this.value;render()"><input type="date" value="${R.to}" onchange="R.to=this.value;render()">`;
+
+/* ---- vues ---- */
+function histTable(L){return `<div class="tw"><table><tr><th>Date</th><th>Opération</th><th>Client</th><th>Camion</th><th></th></tr>${L.map(e=>`<tr class="${e.annule?'x':''}"><td>${fd(e.date)}</td><td>${e.t==='charge'?'+'+e.n+' charge(s)':'Chargement ('+e.quota+')'}</td><td>${esc(nm(e.clientId))}</td><td>${e.camionId?esc(pl(e.camionId)):'—'}</td><td>${e.annule?`<span class="mu" style="display:inline-block">annulé : ${esc(e.annuleMotif||'—')}</span>`:`<button class="b d sm" onclick="cancel('${e.t}',${e.id})">Annuler</button>`}</td></tr>`).join('')||'<tr><td colspan=5 class="mu">Aucun résultat</td></tr>'}</table></div>`}
+function drawHist(){$('#hl').innerHTML=histTable(filt());mob()}
+function drawClients(){const q=CQ.toLowerCase();const L=S.clients.filter(c=>!q||(c.nom+' '+c.tel).toLowerCase().includes(q)).map(c=>({c,s:solde(c.id)})).sort((a,b)=>(!!a.c.inactif-!!b.c.inactif)||b.s-a.s);
+ $('#cl').innerHTML=`<div class="tw"><table><tr><th>Client</th><th>Téléphone</th><th>Solde</th><th></th></tr>${L.map(({c,s})=>`<tr class="${c.inactif?'ina':''}"><td><a href="#" onclick="FC=${c.id};go('fiche');return false"><b>${esc(c.nom)}</b></a>${c.inactif?' <span class="pill p0">Inactif</span>':''}</td><td>${esc(c.tel)}</td><td>${badge(s)}</td><td>${c.inactif?'':`<button class="b sm" onclick="addCharge(${c.id},1)">+1</button> <button class="b s sm" onclick="askCharge(${c.id})">+ n</button> `}<button class="b s sm" onclick="FC=${c.id};go('fiche')">Fiche</button></td></tr>`).join('')||'<tr><td colspan=4 class="mu">Aucun client</td></tr>'}</table></div>`;mob()}
+function drawCamions(){const q=KQ.toLowerCase();const L=S.camions.filter(k=>!q||(k.plaque+' '+chf(k)).toLowerCase().includes(q)).sort((a,b)=>!!a.inactif-!!b.inactif);
+ $('#kl').innerHTML=`<div class="tw"><table><tr><th>Immatriculation</th><th>Chauffeur (client)</th><th>État</th><th>Dernier client</th><th></th></tr>${L.map(k=>{const l=S.chargements.filter(x=>x.camionId===k.id&&!x.annule).sort((a,b)=>b.date-a.date)[0];return `<tr class="${k.inactif?'ina':''}"><td><b>${esc(k.plaque)}</b></td><td><input list="dl-cli" value="${esc(chl(k))}" placeholder="Choisir un client…" onchange="setChauffeur(${k.id},this.value)" style="width:100%;min-width:160px"></td><td>${k.inactif?'<span class="pill p0">Inactif</span>':`<span class="pill ${k.etat==='charge'?'pr':'pv'}">${k.etat==='charge'?'Chargé':'Disponible'}</span>`}</td><td>${l?esc(nm(l.clientId))+' <span class="mu">'+fd(l.date)+'</span>':'—'}</td><td>${k.etat==='charge'&&!k.inactif?`<button class="b s sm" onclick="freeCamion(${k.id})">Remettre disponible</button> `:''}<button class="b s sm" onclick="editCamion(${k.id})">Modifier</button> <button class="b s sm" onclick="toggle('camions',${k.id})">${k.inactif?'Réactiver':'Désactiver'}</button> <button class="b s sm" onclick="F.q='${esc(k.plaque)}';go('hist')">Historique</button></td></tr>`}).join('')||'<tr><td colspan=5 class="mu">Aucun camion</td></tr>'}</table></div>`;mob()}
+const dates=()=>`<input type="date" value="${F.from}" onchange="F.from=this.value;drawHist()"><input type="date" value="${F.to}" onchange="F.to=this.value;drawHist()">`;
+
+const V={
+dash(){const q=S.q,cs=AC().map(c=>({c,s:solde(c.id)})),v=cs.filter(x=>x.s>=q),a=cs.filter(x=>x.s<q&&x.s>=q*2/3&&x.s>0),r=cs.filter(x=>x.s>0&&x.s<q*2/3);
+ const K=AK(),ch=K.filter(k=>k.etat==='charge'),td=dk(Date.now()),b=bilan(td);
+ const warn=(!localStorage.lastBackup||Date.now()-localStorage.lastBackup>7*864e5)?'<div class="card" style="border-color:var(--a)">⚠️ Pas de sauvegarde depuis plus de 7 jours. <a href="#" onclick="go(\'set\');return false">Sauvegarder</a></div>':'';
+ const an=anomalies(),j=CJ||td,bj=bilan(j),clo=S.clot.find(c=>c.jour===j);
+ return warn+`<div class="card"><h3>⚡ Saisie rapide</h3><div class="row"><input id="qc" list="dl-cli" placeholder="Client (tapez le nom ou le téléphone)…" style="flex:3"><input id="qn" type="number" min="1" value="1" style="max-width:80px;flex:none"><input id="qd" type="datetime-local" title="Laisser vide = maintenant"></div><button class="b big" onclick="quick()">+ Octroyer des charges</button><p class="mu" style="margin:8px 0 0">Date vide = maintenant. Renseignez-la pour rattraper un oubli.</p></div>
+ <div class="grid">${kpi('user','Clients verts',v.length,'v')}${kpi('user','Clients ambre',a.length,'a')}${kpi('user','Clients rouges',r.length,'r')}${kpi('truck','Camions disponibles',K.length-ch.length)}${kpi('truck','Camions chargés',ch.length,'r')}${kpi('zap','Charges aujourd\'hui',b.charges)}${kpi('box','Chargements aujourd\'hui',b.chargements,'a')}</div><br>
+ ${an.length?`<div class="card" style="border-color:var(--r)"><h3>🚨 Anomalies (14 derniers jours)</h3>${an.map(x=>`<div>${esc(x)}</div>`).join('')}</div>`:''}
+ <div class="card"><h3>Prêts à charger</h3>${v.map(x=>`<a href="#" onclick="FC=${x.c.id};go('fiche');return false">${esc(x.c.nom)}</a> ${badge(x.s)}`).join('<br>')||'<span class="mu">Aucun client n\'a atteint le quota.</span>'}</div>
+ <div class="card"><h3>🔒 Clôture de journée</h3><div class="row"><input type="date" value="${j}" max="${td}" onchange="CJ=this.value;render()" style="max-width:170px;flex:none"><span>${bj.charges} charge(s) · ${bj.chargements} chargement(s) · ${bj.annulations} annulation(s)</span></div>
+ ${clo?`<p>✅ Clôturée le ${fd(clo.le)}. <button class="b d sm" onclick="rouvrir('${j}')">Rouvrir</button></p>`:`<button class="b" onclick="cloturer('${j}')">Clôturer cette journée</button>`}
+ ${S.clot.length?`<p class="mu" style="margin-bottom:0">Dernières clôtures : ${[...S.clot].sort((x,y)=>y.le-x.le).slice(0,5).map(c=>`${c.jour} (${c.charges}/${c.chargements})`).join(' · ')}</p>`:''}</div>`},
+cli(){return `<div class="card"><h3>Nouveau client</h3><div class="row"><input id="cn" placeholder="Nom du client"><input id="ct" placeholder="Téléphone (facultatif)"><button class="b" onclick="addClient()">Ajouter</button></div></div>
+ <div class="card"><h3>Clients</h3><div class="row"><input list="dl-names" placeholder="Rechercher nom ou téléphone…" value="${esc(CQ)}" oninput="CQ=this.value;drawClients()"></div><div id="cl"></div></div>`},
+fiche(){const c=S.clients.find(x=>x.id===FC);if(!c)return '<div class="card">Client introuvable.</div>';
+ const L=ev().filter(e=>e.clientId===FC),ok=L.filter(e=>!e.annule),last=ok[0],used={};
+ S.chargements.filter(x=>x.clientId===FC&&!x.annule).forEach(x=>used[x.camionId]=(used[x.camionId]||0)+1);
+ const drv=S.camions.filter(k=>k.chauffeurId===FC);
+ return `<button class="b s sm" onclick="go('cli')">← Clients</button>
+ <div class="card" style="margin-top:10px"><h3>${esc(c.nom)} ${c.inactif?'<span class="pill p0">Inactif</span>':''}</h3>
+ <p>📞 ${esc(c.tel)||'—'} · Enregistré le ${fd(c.date)}</p><p>${badge(solde(c.id))}</p>
+ <p>Dernière visite : <b>${last?fd(last.date):'—'}</b><br>Charges reçues : <b>${ok.filter(e=>e.t==='charge').reduce((s,e)=>s+e.n,0)}</b> · Chargements : <b>${ok.filter(e=>e.t==='chargement').length}</b></p>
+ <p>Camions utilisés : ${Object.entries(used).map(([i,n])=>`<b>${esc(pl(+i))}</b> (${n}×)`).join(', ')||'—'}<br>Chauffeur de : ${drv.map(k=>`<b>${esc(k.plaque)}</b>`).join(', ')||'—'}</p>
+ <div class="row">${c.inactif?'':`<button class="b" onclick="addCharge(${c.id},1)">+1 charge</button><button class="b s" onclick="askCharge(${c.id})">+ n charges</button>`}<button class="b s" onclick="editClient(${c.id})">Modifier</button><button class="b ${c.inactif?'s':'d'}" onclick="toggle('clients',${c.id})">${c.inactif?'Réactiver':'Désactiver'}</button></div>
+ <div class="row"><input id="fm" list="dl-cli" placeholder="Doublon ? Fusionner dans le client…"><button class="b s" onclick="merge()">Fusionner</button></div></div>
+ <div class="card"><h3>Historique</h3>${histTable(L)}</div>`},
+cam(){return `<div class="card"><h3>Nouveau camion</h3><div class="row"><input id="kp" placeholder="Immatriculation"><input id="kc" list="dl-cli" placeholder="Chauffeur : tapez le nom d'un client…"><button class="b" onclick="addCamion()">Ajouter</button></div></div>
+ <div class="card"><h3>Camions</h3><div class="row"><input list="dl-names" placeholder="Rechercher immatriculation ou chauffeur…" value="${esc(KQ)}" oninput="KQ=this.value;drawCamions()"></div><div id="kl"></div></div>`},
+load(){return `<div class="card"><h3>Nouveau chargement (quota : ${S.q} charges)</h3><div class="row"><input id="lc" list="dl-lc" placeholder="Client (quota atteint) : tapez pour chercher…" onchange="autoCam()"><input id="lk" list="dl-lk" placeholder="Camion disponible : immatriculation ou chauffeur…"><button class="b" onclick="doLoad()">Valider le chargement</button></div><p class="mu">Seuls les clients ayant atteint le quota et les camions non chargés sont proposés. Si le client est chauffeur d'un camion disponible, celui-ci est proposé automatiquement.</p></div>`},
+hist(){setTimeout(drawHist);return `<div class="card"><h3>Historique</h3><div class="row"><input list="dl-names" placeholder="Client ou immatriculation…" value="${esc(F.q)}" oninput="F.q=this.value;drawHist()"><select onchange="F.type=this.value;drawHist()"><option value="">Tout</option><option value="charge" ${F.type==='charge'?'selected':''}>Charges</option><option value="chargement" ${F.type==='chargement'?'selected':''}>Chargements</option></select>${dates()}<button class="b s" onclick="csv()">Export CSV</button></div><div id="hl"></div></div>`},
+rap(){const d=calc();const ctl=`<div class="card np"><h3>Rapport d'activité</h3><div class="row">${rdates()}<select onchange="R.g=this.value;render()">${['jour','semaine','mois'].map(g=>`<option value="${g}" ${R.g===g?'selected':''}>Par ${g}</option>`).join('')}</select></div><div class="row"><button class="b" onclick="print()">🖨 Imprimer / PDF</button><button class="b s" onclick="exportXls()">Export Excel (4 feuilles)</button></div></div>`;
+ if(!d)return ctl+'<div class="card">Période invalide.</div>';
+ const mx=Math.max(1,...d.bs.map(([,v])=>Math.max(v.c,v.l))),lb=x=>R.g==='mois'?x:x.slice(8)+'/'+x.slice(5,7),mr=Math.max(1,...d.rank.map(([,v])=>v.c));
+ return ctl+`<div class="po"><h2>Rapport d'activité</h2><p>Période : du ${R.from} au ${R.to} · édité le ${fd(Date.now())}</p></div>
+ <div class="grid">${kpi('zap','Charges octroyées',d.a.c,'',delta(d.a.c,d.b.c))}${kpi('box','Chargements',d.a.l,'a',delta(d.a.l,d.b.l))}${kpi('truck','Camions utilisés',d.a.k,'n',delta(d.a.k,d.b.k))}${kpi('users','Clients actifs',d.a.u,'v',delta(d.a.u,d.b.u))}</div><br>
+ <div class="card"><h3>Évolution (par ${R.g})</h3><div class="tw"><div class="ch">${d.bs.map(([k,v])=>`<div class="bc"><div class="bars"><i style="height:${v.c/mx*100}%;background:var(--pr)"></i><i style="height:${v.l/mx*100}%;background:var(--a)"></i></div><small><b>${v.c}</b>/${v.l}</small><small class="mu">${lb(k)}</small></div>`).join('')}</div></div><div class="leg mu"><i style="background:var(--pr)"></i>Charges<i style="background:var(--a)"></i>Chargements</div></div>
+ <div class="card"><h3>Classement des clients (charges)</h3><div class="tw"><table><tr><th>#</th><th>Client</th><th>Charges</th><th></th></tr>${d.rank.map(([i,v],n)=>`<tr><td>${n+1}</td><td>${esc(nm(+i))}</td><td>${v.c}</td><td><div class="meter"><div style="width:${v.c/mr*100}%"></div></div></td></tr>`).join('')||'<tr><td colspan=4 class="mu">Aucune activité</td></tr>'}</table></div></div>
+ <div class="card"><h3>Utilisation des camions</h3><div class="tw"><table><tr><th>Camion</th><th>Chargements</th><th>Jours utilisés</th><th>Taux</th></tr>${d.use.map(u=>`<tr><td><b>${esc(u.k.plaque)}</b></td><td>${u.l}</td><td>${u.d} / ${d.len}</td><td><div class="meter"><div style="width:${u.pct}%"></div></div> ${u.pct}%</td></tr>`).join('')||'<tr><td colspan=4 class="mu">Aucun camion</td></tr>'}</table></div></div>
+ <div class="card"><h3>Clients inactifs avec des charges en attente</h3><div class="row np">Depuis au moins <input type="number" min="1" value="${R.inact}" style="max-width:80px;flex:none" onchange="R.inact=+this.value||7;render()"> jours</div><div class="tw"><table><tr><th>Client</th><th>Téléphone</th><th>Solde</th><th>Dernière activité</th></tr>${d.inact.map(x=>`<tr><td><a href="#" onclick="FC=${x.c.id};go('fiche');return false">${esc(x.c.nom)}</a></td><td>${esc(x.c.tel)}</td><td>${badge(x.s)}</td><td>${fd(x.last)} (${Math.floor((Date.now()-x.last)/864e5)} j)</td></tr>`).join('')||'<tr><td colspan=4 class="mu">Aucun client concerné</td></tr>'}</table></div></div>
+ <div class="card"><h3>Par client</h3><div class="tw"><table><tr><th>Client</th><th>Charges</th><th>Chargements</th><th>Situation actuelle</th></tr>${Object.entries(d.bc).map(([i,v])=>`<tr><td>${esc(nm(+i))}</td><td>${v.c}</td><td>${v.l}</td><td>${badge(solde(+i))}</td></tr>`).join('')||'<tr><td colspan=4 class="mu">Aucune activité</td></tr>'}</table></div></div>
+ <div class="card"><h3>Par camion</h3><div class="tw"><table><tr><th>Camion</th><th>Chargements</th><th>Clients servis</th></tr>${Object.entries(d.bk).map(([i,v])=>`<tr><td>${esc(pl(+i))}</td><td>${v.l}</td><td>${esc([...v.cl].join(', '))}</td></tr>`).join('')||'<tr><td colspan=3 class="mu">Aucune activité</td></tr>'}</table></div></div>
+ <div class="po pr-sign"><span>Établi par : ____________</span><span>Validé par : ____________</span></div>`},
+set(){return `<div class="card"><h3>Quota de charges par camion</h3><div class="row"><input id="sq" type="number" min="1" value="${S.q}" style="max-width:100px;flex:none"><button class="b" onclick="saveQ()">Enregistrer</button></div><p class="mu">Le nouveau quota s'applique aux chargements futurs ; les chargements passés gardent leur quota d'origine.</p></div>
+ <div class="card"><h3>Sauvegarde</h3><div class="row"><button class="b" onclick="exportJSON()">Exporter (JSON)</button><label class="b s" style="cursor:pointer;padding:8px 10px;border:1px solid var(--pr);border-radius:8px;color:var(--pr)">Restaurer…<input type="file" accept=".json" hidden onchange="importJSON(this.files[0])"></label></div><p class="mu">Les données sont stockées sur cet appareil uniquement. Exportez régulièrement.</p></div>`}};
+function go(t){tab=t;document.body.classList.remove('open');render();scrollTo(0,0)}
+function render(){const u=lastOp(),cur=TABS.find(x=>x[0]===tab);
+ $('#hd').innerHTML=`<button class="brg" onclick="document.body.classList.toggle('open')" aria-label="Menu">${ico('menu',20)}</button><span class="ttl">${cur?cur[1]:'Fiche client'}</span><div class="sp"></div>${u?'<button class="u" onclick="undoLast()">↩&nbsp; Annuler la dernière action</button>':''}`;
+ $('#nav').innerHTML=TABS.map(([k,l,i])=>`<button class="${k===tab?'on':''}" onclick="go('${k}')">${ico(i)}<span>${l}</span></button>`).join('');
+ $('#app').innerHTML=V[tab]()+DL();if(tab==='cli')drawClients();if(tab==='cam')drawCamions();mob()}
+(async()=>{db=await open();await load();await autoReset();render();if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})})();
+</script></body></html>
